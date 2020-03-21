@@ -1,0 +1,20 @@
+version: "2"
+
+services:
+  server:
+    build: .
+    restart: always
+    networks:
+     - proxy 
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.owncloud-tls.rule=Host(`clbc-vpm.nathangrove.com`)
+      - traefik.http.routers.owncloud-tls.entrypoints=web-secure
+      - traefik.http.routers.owncloud-tls.tls.certresolver=le
+      - traefik.http.services.owncloud.loadbalancer.server.port=3000
+      - traefik.http.middlewares.owncloud-redirectscheme.redirectscheme.scheme=https
+
+networks:
+  proxy:
+    external: true

@@ -21,14 +21,19 @@
             background-image: url('http://citylightbc.com/wp-content/themes/resurrect/images/backgrounds/asphalt.jpg');
             color: #fffefe;
         }
+        #connect {
+            background-color: #f6852a;
+            color: #393939;
+            border-color: #fffdfc;
+        }
         
         #wrapper {
             text-align: center;
             color: #fffefe;
         }
-
+        
         #logo {
-            width: 600px;
+            width: 100%;
         }
         
         #header {
@@ -38,7 +43,7 @@
         #uname {
             padding-top: 200px;
         }
-
+        
         #waiting {
             display: none;
             padding-top: 200px;
@@ -81,6 +86,12 @@
                 height: 32px;
             }
         }
+        #meeting {
+            overflow: hidden; 
+            padding-top: 56.25%; 
+            position: relative;
+            display: none;
+        }
         
         
     </style>
@@ -88,20 +99,22 @@
 </head>
 <body>
     
-    <div class="col-md-6 offset-md-3" id="wrapper">
-
-        <img id="logo" src="http://citylightbc.com/wp-content/uploads/2014/06/CLBC_Logo-DarkBackground.png" />
-
-        <h1 id="header">Virtual Meeting</h1>
+    <div class="col-lg-6 offset-lg-3" id="wrapper">
         
-        <div id="uname">
-            <h3>What shall we call you?</h3>
-            <div class="input-group mb-3">
-                <input type="text" id="username" placeholder="Name" class="form-control" />
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary" id="connect" type="button">Connect</button>
+        <img id="logo" src="http://citylightbc.com/wp-content/uploads/2014/06/CLBC_Logo-DarkBackground.png" />
+        
+        <h1 id="header">Virtual Prayer Rooms</h1>
+        
+        <div class="col-md-6 offset-md-3">
+            <div id="uname">
+                <h3>Tell us your name.</h3>
+                <div class="input-group mb-3">
+                    <input type="text" id="username" placeholder="Name" class="form-control" />
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" id="connect" type="button">Connect</button>
+                    </div>
                 </div>
-              </div>
+            </div>
         </div>
         
         <div id="waiting">
@@ -109,6 +122,10 @@
             <h3>Please wait while we connect you.</h3>
         </div>
 
+        <div id="meeting">
+            
+        </div>
+        
     </div>
     
     
@@ -116,6 +133,7 @@
         $(function () {
             
             var socket = io();
+            var username = '';
             
             if (localStorage['clpr-id']){
                 socket.emit('id', localStorage['clpr-id']);
@@ -127,13 +145,34 @@
                 console.log('id receieved');
                 localStorage['clpr-id'] = id;
             });
+
+            socket.on('join', (roomId) => {
+
+                $("#waiting").hide();
+                $("#meeting").show();
+                // <iframe allow="microphone; camera" style="border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%;" src="" frameborder="0"></iframe>
+                let iframe = document.createElement('iframe');
+                iframe.allow = "microphone; camera; faullscreen; allow-same-origin;";
+                iframe.style = "border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%;";
+                iframe.src = "https://zoom.us/wc/" + roomId + "/join?prefer=1&un=" + btoa(username);
+                iframe.frameborder = "0";
+                $("#meeting").append(iframe);
+            
+            });
+
             
             $('#connect').on('click', () => {
-                let username = $('#username').val();
+                username = $('#username').val();
                 $('#uname').hide();
                 $('#waiting').show();
                 socket.emit('username', username);
+
+                setTimeout(() => {
+                },5000);
+
             })
+
+
             
         });
     </script>

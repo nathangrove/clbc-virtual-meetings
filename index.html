@@ -19,27 +19,38 @@
         body {
             text-align: center;
             background-image: url('http://citylightbc.com/wp-content/themes/resurrect/images/backgrounds/asphalt.jpg');
+            color: #fffefe;
         }
         
+        #wrapper {
+            text-align: center;
+            color: #fffefe;
+        }
+
         #logo {
             width: 600px;
         }
         
         #header {
-            color: #fffefe;
             font-size: 50px;
         }
         
-        #waiting {
-            color: #fffefe;
+        #uname {
             padding-top: 200px;
         }
+
+        #waiting {
+            display: none;
+            padding-top: 200px;
+        }
+        
         .lds-facebook {
             display: inline-block;
             position: relative;
             width: 80px;
             height: 80px;
         }
+        
         .lds-facebook div {
             display: inline-block;
             position: absolute;
@@ -73,34 +84,57 @@
         
         
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha256-L/W5Wfqfa0sdBNIKN9cG6QA5F2qx4qICmU2VgLruv9Y=" crossorigin="anonymous" />
 </head>
 <body>
     
-    <img id="logo" src="http://citylightbc.com/wp-content/uploads/2014/06/CLBC_Logo-DarkBackground.png" />
-    <h1 id="header">Virtual Prayer Rooms</h1>
-    
-    <div id="waiting">
-        <div class="lds-facebook"><div></div><div></div><div></div></div>
-        <h3>Please wait while we connect you.</h3>
-    </div>
+    <div class="col-md-6 offset-md-3" id="wrapper">
 
+        <img id="logo" src="http://citylightbc.com/wp-content/uploads/2014/06/CLBC_Logo-DarkBackground.png" />
+
+        <h1 id="header">Virtual Meeting</h1>
+        
+        <div id="uname">
+            <h3>What shall we call you?</h3>
+            <div class="input-group mb-3">
+                <input type="text" id="username" placeholder="Name" class="form-control" />
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" id="connect" type="button">Connect</button>
+                </div>
+              </div>
+        </div>
+        
+        <div id="waiting">
+            <div class="lds-facebook"><div></div><div></div><div></div></div>
+            <h3>Please wait while we connect you.</h3>
+        </div>
+
+    </div>
+    
     
     <script>
         $(function () {
-
+            
             var socket = io();
-
+            
             if (localStorage['clpr-id']){
                 socket.emit('id', localStorage['clpr-id']);
             } else {
                 socket.emit('new');
             }
-
+            
             socket.on('id', id => {
                 console.log('id receieved');
                 localStorage['clpr-id'] = id;
             });
-
+            
+            $('#connect').on('click', () => {
+                let username = $('#username').val();
+                $('#uname').hide();
+                $('#waiting').show();
+                socket.emit('username', username);
+            })
+            
         });
     </script>
     

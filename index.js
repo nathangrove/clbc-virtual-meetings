@@ -24,7 +24,25 @@ app.use('*', (req,res,next) => {
     res.sendStatus(401);
     return logIt(req,res);
   }
+
+  let [username, password] = Buffer.from(authorization, 'base64').toString().split(':');
+  console.log(username,password);
 })
+
+app.get('/api/sessions', (req,res,next) => {
+
+
+  res.send({ sessions: database.sessions });
+
+  next();
+    
+});
+
+
+app.use('*', (req,res) => {
+  logIt(req,res);
+});
+
 
 io.on('connection', function(socket){
 
@@ -42,12 +60,16 @@ io.on('connection', function(socket){
   
   socket.on('id', (id) => {
     console.log('user reconnected with id', id);
-    if (!sessions[id]){
-      establishSession()
+    if (!database.sessions[id]){
+      establishSession();
     } else {
-      sessions[id].lastConnected = new Date().toISOString();
+      database.sessions[id].lastConnected = new Date().toISOString();
     }
   })
+
+  socket.on('username', username => {
+    database.sessions[id].username = username;
+  });
   
   socket.on('disconnect', function(){
     console.log('user disconnected');
